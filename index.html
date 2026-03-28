@@ -18,7 +18,360 @@
         }
 
         .container { 
-            display: flex; 
+            display: flex; <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jornada da Fé - Família Unida</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --accent: #e67e22; --bg: #f4f7f6; --danger: #7f1d1d; }
+        body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; }
+
+        .container { display: flex; flex-direction: row; gap: 15px; padding: 10px; max-width: 100vw; box-sizing: border-box; }
+        
+        @media (max-width: 850px) {
+            .container { flex-direction: column; align-items: center; }
+            #tabuleiro { grid-template-columns: repeat(5, 1fr) !important; width: 98vw !important; }
+            .casa { height: 20vw !important; font-size: 10px !important; }
+            #painel-info { width: 95vw !important; position: static !important; }
+        }
+
+        #painel-info { 
+            width: 320px; background: white; border-radius: 15px; padding: 25px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 8px solid var(--accent); 
+            position: sticky; top: 10px; font-size: 18px; 
+        }
+
+        #tabuleiro { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; padding: 12px; background: white; border-radius: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+        .casa { width: 90px; height: 90px; border-radius: 8px; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; border: 1px solid #eee; font-size: 12px; position: relative; text-transform: uppercase; }
+        
+        .peao { width: 22px; height: 22px; border-radius: 50%; position: absolute; z-index: 10; border: 2px solid white; transition: all 0.4s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        
+        .missao { background: #e3f2fd; color: #1976d2; }
+        .desafio { background: #fee2e2; color: #dc2626; }
+        .sorte { background: #f0fdf4; color: #16a34a; }
+        .pecado { background: #450a0a; color: #fca5a5; border: 3px solid red; }
+        .alvo { background: #fef3c7; color: #d97706; border: 3px solid #fbbf24; border-radius: 50%; }
+
+        .controles { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .vol-control { display: flex; align-items: center; gap: 8px; background: #eee; padding: 10px; border-radius: 10px; }
+        
+        .btn { padding: 15px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-size: 16px; }
+        .btn-jogar { background: #10b981; }
+        .btn-reset { background: #ef4444; }
+
+        #setup { position: fixed; inset: 0; background: white; z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; overflow-y: auto;}
+        .player-entry { margin: 10px; display: flex; gap: 10px; width: 100%; max-width: 450px; align-items: center;}
+        .player-entry input, .player-entry select { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; flex: 1;}
+        
+        .quiz-area { display: none; margin-top: 15px; border-top: 2px solid #eee; padding-top: 10px; }
+        .btn-opcao { display: block; width: 100%; padding: 18px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; text-align: left; font-size: 16px; font-weight: 500; }
+        .dica-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 10px; margin-top: 10px; font-size: 14px; color: #92400e; }
+    </style>
+</head>
+<body>
+
+    <audio id="musicaFundo" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="setup">
+        <h1 style="color: var(--accent); font-size: 32px; margin-bottom: 10px;">Jornada da Fé em Família</h1>
+        <p style="font-size: 18px; margin-bottom: 20px;">Quem vai embarcar nessa aventura hoje?</p>
+        
+        <div id="lista-jogadores">
+            <div class="player-entry">
+                <input type="text" placeholder="Nome" value="Pai">
+                <select id="nivel-0">
+                    <option value="avancado">Avançado 🔥</option>
+                    <option value="intermediario">Intermediário</option>
+                    <option value="basico">Básico</option>
+                </select>
+            </div>
+            <div class="player-entry">
+                <input type="text" placeholder="Nome" value="Mãe">
+                <select id="nivel-1">
+                    <option value="avancado">Avançado 🔥</option>
+                    <option value="intermediario">Intermediário</option>
+                    <option value="basico">Básico</option>
+                </select>
+            </div>
+            <div class="player-entry">
+                <input type="text" placeholder="Nome" value="Filho">
+                <select id="nivel-2">
+                    <option value="basico">Básico (Kids)</option>
+                    <option value="intermediario">Intermediário (Teen)</option>
+                    <option value="avancado">Avançado 🔥</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px; width: 100%; max-width: 350px;">
+            <button class="btn" style="background:#3b82f6" onclick="addJogador()">+ Adicionar Pessoa</button>
+            <button class="btn btn-jogar" onclick="iniciarJogo()">Começar Agora! 🚀</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="tabuleiro-container">
+            <div class="controles">
+                <button class="btn btn-jogar" id="btnDado" onclick="jogarDado()">Lançar Dado 🎲</button>
+                <div class="vol-control">
+                    <span>🔈</span>
+                    <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5" oninput="ajustarVolume()">
+                    <span>🔊</span>
+                </div>
+                <button class="btn btn-reset" onclick="location.reload()">Sair</button>
+                <div id="status-turno" style="padding:12px; border-radius:10px; color:white; font-weight:bold; min-width: 100px; text-align:center; font-size: 18px;"></div>
+                <div id="val-dado" style="font-size:32px; font-weight:800; color: var(--accent);"></div>
+            </div>
+            <div id="tabuleiro"></div>
+        </div>
+
+        <aside id="painel-info">
+            <h3 id="info-titulo" style="margin:0 0 15px 0; font-size: 22px;">📍 Missão / Pergunta</h3>
+            <div id="conteudo-painel" style="line-height: 1.5;">Prepare o seu coração!</div>
+            <div id="quiz-container" class="quiz-area">
+                <p id="pergunta" style="font-weight:bold; font-size: 18px;"></p>
+                <div id="opcoes"></div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const cores = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#f97316'];
+        
+        const missoesPorNivel = {
+            basico: [
+                "Sorria para todos! 😊", "Dê um abraço na pessoa ao lado 🤗", "Diga: Jesus me ama! ❤️",
+                "Ore pela sua família 👨‍👩‍👧‍👦", "Diga um motivo de gratidão 🌟", "Cante um refrão de um louvor 🎶",
+                "Diga: Obrigado Senhor! 🙌", "Ore pelo seu amiguinho 🙏", "Mande um beijo para Jesus! 😘"
+            ],
+            intermediario: [
+                "Ore pelos seus vizinhos 🏠", "Cite um Salmo que você conhece 📜", "Ore pela sua cidade 🏙️",
+                "Peça perdão a alguém ou abençoe alguém 🙏", "Ore pelos professores 🎓", "Diga: Sou dizimista por gratidão ⛪",
+                "Explique o que é a fé para você ✨", "Abençoe o seu pai e sua mãe 👨‍👩‍👧‍👦", "Ore pela sua nação 🇧🇷"
+            ],
+            avancado: [
+                "Faça uma mini-pregação de 1 minuto 📢", "Ore pelos seus Pastores e Líderes ⛪", "Abençoe seus avós (ou ore por eles) ❤️",
+                "Diga: Eu amo o Espírito Santo! 🔥", "Cite um versículo de cor 📖", "Faça uma oração de guerra espiritual pela família 🙏",
+                "Fale sobre o fruto do Espírito 🍇", "Ore por quem ainda não conhece Jesus 🌍", "Diga como ser fiel à Palavra de Deus 🛡️"
+            ]
+        };
+
+        let statusMissoes = { basico: [...missoesPorNivel.basico], intermediario: [...missoesPorNivel.intermediario], avancado: [...missoesPorNivel.avancado] };
+
+        const bancoPerguntas = {
+            basico: [
+                { p: "Quem construiu a arca?", r: ["Noé", "Moisés", "Pedro"], c: 0, d: "Dica: Está no início da Bíblia.", v: "Gênesis 6:14" },
+                { p: "Quantos dias Deus levou para criar o mundo?", r: ["3", "7", "6"], c: 2, d: "Dica: No sétimo Ele descansou.", v: "Gênesis 1" }
+            ],
+            intermediario: [
+                { p: "Qual o mar que se abriu para o povo de Israel?", r: ["Mar Morto", "Mar Vermelho", "Mar da Galileia"], c: 1, d: "Dica: Aconteceu no Êxodo.", v: "Êxodo 14:21" },
+                { p: "Qual o primeiro livro do Novo Testamento?", r: ["Lucas", "Mateus", "João"], c: 1, d: "Dica: Vem logo após o Antigo Testamento.", v: "Mateus 1:1" }
+            ],
+            avancado: [
+                { p: "Quem foi o pai de Matusalém?", r: ["Enoque", "Lameque", "Sete"], c: 0, d: "Dica: Ele não viu a morte, Deus o levou.", v: "Gênesis 5:21" },
+                { p: "Qual profeta foi alimentado por corvos?", r: ["Eliseu", "Elias", "Isaías"], c: 1, d: "Dica: Ele desafiou os profetas de Baal.", v: "1 Reis 17:4" }
+            ]
+        };
+
+        let statusPerguntas = { basico: [...bancoPerguntas.basico], intermediario: [...bancoPerguntas.intermediario], avancado: [...bancoPerguntas.avancado] };
+        
+        let jogadores = [], turno = 0, audioCtx;
+        const casasArr = [];
+        
+        for(let i=0; i<40; i++) {
+            if(i === 0) casasArr.push({ c: 'branco', t: "INÍCIO" });
+            else if(i === 39) casasArr.push({ c: 'alvo', t: "VITÓRIA ⭐" });
+            else if(i === 15 || i === 30) casasArr.push({ c: 'pecado', t: "PECADO: VOLTE AO INÍCIO" });
+            else if(i % 5 === 0) casasArr.push({ c: 'desafio', t: "PERGUNTA" });
+            else if(i % 8 === 0) casasArr.push({ c: 'sorte', t: "BÔNUS +1" });
+            else casasArr.push({ c: 'missao', t: "MISSÃO" });
+        }
+
+        function addJogador() {
+            const lista = document.getElementById('lista-jogadores');
+            const id = lista.children.length;
+            if(id < 6) {
+                const div = document.createElement('div');
+                div.className = 'player-entry';
+                div.innerHTML = `<input type="text" placeholder="Nome"><select id="nivel-${id}"><option value="basico">Básico</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado 🔥</option></select>`;
+                lista.appendChild(div);
+            }
+        }
+
+        function iniciarJogo() {
+            const entries = document.querySelectorAll('.player-entry');
+            entries.forEach((en, i) => {
+                const n = en.querySelector('input').value;
+                const v = en.querySelector('select').value;
+                if(n) {
+                    jogadores.push({ id: i, nome: n, nivel: v, pos: 0, cor: cores[i] });
+                    const p = document.createElement('div');
+                    p.className = 'peao'; p.id = `peao-${i}`;
+                    p.style.backgroundColor = cores[i];
+                    document.getElementById('tabuleiro').appendChild(p);
+                }
+            });
+            if(jogadores.length === 0) { alert("Por favor, adicione pelo menos um jogador!"); return; }
+            document.getElementById('setup').style.display = 'none';
+            gerarTabuleiro();
+            atualizarInterface();
+            setTimeout(posicionar, 100);
+            document.getElementById('musicaFundo').play().catch(() => {});
+        }
+
+        function gerarTabuleiro() {
+            const tab = document.getElementById('tabuleiro');
+            const colunas = window.innerWidth <= 850 ? 5 : 8;
+            tab.style.gridTemplateColumns = `repeat(${colunas}, 1fr)`;
+            casasArr.forEach((d, i) => {
+                const div = document.createElement('div');
+                div.className = `casa ${d.c}`; div.id = `casa-${i}`;
+                div.innerText = d.t;
+                const linha = Math.floor(i / colunas);
+                div.style.order = (linha % 2 === 0) ? i : (linha * colunas) + (colunas - 1 - (i % colunas));
+                tab.appendChild(div);
+            });
+        }
+
+        function jogarDado() {
+            const val = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('val-dado').innerText = val;
+            document.getElementById('btnDado').disabled = true;
+            mover(jogadores[turno], val);
+        }
+
+        async function mover(jog, num) {
+            for(let i=0; i<num; i++) {
+                if(jog.pos < 39) {
+                    jog.pos++;
+                    posicionar();
+                    bip(400 + (i*80));
+                    await new Promise(r => setTimeout(r, 400));
+                }
+            }
+            processarCasa(jog);
+        }
+
+        function processarCasa(jog) {
+            const casa = casasArr[jog.pos];
+            const painel = document.getElementById('conteudo-painel');
+
+            if(casa.c === 'pecado') {
+                painel.innerHTML = `<b style="color:red; font-size: 22px;">ARMADILHA!</b><br>O pecado atrasa a nossa caminhada. Volte para o início para se renovar.<br><br><button class="btn btn-reset" onclick="voltarInicio()">Recomeçar 🙏</button>`;
+            } else if(casa.c === 'desafio') {
+                abrirQuiz(jog);
+            } else if (casa.c === 'missao') {
+                const n = jog.nivel;
+                if(statusMissoes[n].length === 0) statusMissoes[n] = [...missoesPorNivel[n]];
+                const idx = Math.floor(Math.random() * statusMissoes[n].length);
+                const missao = statusMissoes[n].splice(idx, 1)[0];
+                painel.innerHTML = `<strong>${jog.nome}</strong>, seu desafio é:<br><br><span style="font-size:22px; color:var(--accent); font-weight:bold">${missao}</span><br><br><button class="btn btn-jogar" onclick="proximoTurno()">Concluído! ✅</button>`;
+            } else if (casa.c === 'sorte') {
+                painel.innerHTML = `✨ <b>BÔNUS!</b> Você foi abençoado e avança mais 1 casa.<br><br><button class="btn btn-jogar" onclick="moverBonus()">Avançar 🚀</button>`;
+            } else {
+                proximoTurno();
+            }
+        }
+
+        function moverBonus() {
+            jogadores[turno].pos = Math.min(39, jogadores[turno].pos + 1);
+            posicionar();
+            proximoTurno();
+        }
+
+        function voltarInicio() {
+            jogadores[turno].pos = 0;
+            posicionar();
+            proximoTurno();
+        }
+
+        function abrirQuiz(jog) {
+            let n = jog.nivel;
+            if(statusPerguntas[n].length === 0) statusPerguntas[n] = [...bancoPerguntas[n]];
+            const idx = Math.floor(Math.random() * statusPerguntas[n].length);
+            const q = statusPerguntas[n].splice(idx, 1)[0];
+
+            const area = document.getElementById('quiz-container');
+            area.style.display = 'block';
+            document.getElementById('pergunta').innerHTML = `${q.p}<div class="dica-box">💡 ${q.d}</div>`;
+            const ops = document.getElementById('opcoes');
+            ops.innerHTML = '';
+            
+            q.r.forEach((txt, i) => {
+                const b = document.createElement('button');
+                b.className = 'btn-opcao'; 
+                b.innerText = txt;
+                b.onclick = () => {
+                    if(i === q.c) {
+                        alert(`EXCELENTE! 🎉\nResposta em: ${q.v}\nAvance 1 casa.`);
+                        jog.pos = Math.min(39, jog.pos + 1);
+                    } else {
+                        alert(`QUASE! ❌\nA resposta correta estava em ${q.v}.\nVolte 1 casa.`);
+                        jog.pos = Math.max(0, jog.pos - 1);
+                    }
+                    posicionar(); area.style.display = 'none'; proximoTurno();
+                };
+                ops.appendChild(b);
+            });
+        }
+
+        function proximoTurno() {
+            if(jogadores[turno].pos === 39) {
+                confetti({particleCount: 200, spread: 90, origin: { y: 0.6 }});
+                alert("🏆 GLÓRIA A DEUS! " + jogadores[turno].nome.toUpperCase() + " VENCEU!");
+                location.reload();
+                return;
+            }
+            turno = (turno + 1) % jogadores.length;
+            atualizarInterface();
+            document.getElementById('btnDado').disabled = false;
+        }
+
+        function posicionar() {
+            jogadores.forEach(j => {
+                const c = document.getElementById(`casa-${j.pos}`);
+                if(!c) return;
+                const r = c.getBoundingClientRect();
+                const tr = document.getElementById('tabuleiro').getBoundingClientRect();
+                const p = document.getElementById(`peao-${j.id}`);
+                const size = window.innerWidth <= 850 ? 15 : 30;
+                p.style.left = (r.left - tr.left + size + (j.id*2)) + 'px';
+                p.style.top = (r.top - tr.top + size + (j.id*2)) + 'px';
+            });
+        }
+
+        function ajustarVolume() {
+            const v = document.getElementById('volSlider').value;
+            document.getElementById('musicaFundo').volume = v;
+        }
+
+        function atualizarInterface() {
+            const st = document.getElementById('status-turno');
+            st.innerText = jogadores[turno].nome;
+            st.style.backgroundColor = jogadores[turno].cor;
+            document.getElementById('val-dado').innerText = "";
+        }
+
+        function bip(f) {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            o.frequency.value = f;
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            o.start(); o.stop(audioCtx.currentTime + 0.3);
+        }
+
+        window.onresize = posicionar;
+    </script>
+</body>
+</html>
             flex-direction: row; 
             gap: 15px; 
             padding: 10px; 
