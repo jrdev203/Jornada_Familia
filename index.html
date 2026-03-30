@@ -3,55 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jornada da Fé - Versão Master</title>
+    <title>Jornada da Fé - Pro Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --accent: #e67e22; --bg: #f4f7f6; --danger: #7f1d1d; }
         body { margin: 0; background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; }
 
-        /* Layout e Fontes Maiores */
         .container { display: flex; flex-direction: row; gap: 15px; padding: 10px; max-width: 100vw; box-sizing: border-box; }
-        
         @media (max-width: 850px) {
             .container { flex-direction: column; align-items: center; }
-            #tabuleiro { grid-template-columns: repeat(5, 1fr) !important; width: 98vw !important; }
-            .casa { height: 20vw !important; font-size: 10px !important; } /* Fonte aumentada */
+            #tabuleiro { grid-template-columns: repeat(5, 1fr) !important; width: 95vw !important; }
+            .casa { height: 18vw !important; font-size: 8px !important; }
             #painel-info { width: 95vw !important; position: static !important; }
         }
 
-        #painel-info { 
-            width: 320px; background: white; border-radius: 15px; padding: 25px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 8px solid var(--accent); 
-            position: sticky; top: 10px; font-size: 18px; /* Fonte maior no painel */
-        }
+        #painel-info { width: 300px; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 8px solid var(--accent); position: sticky; top: 10px; }
+        #tabuleiro { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; padding: 10px; background: white; border-radius: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 
-        #tabuleiro { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; padding: 12px; background: white; border-radius: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-
-        .casa { width: 90px; height: 90px; border-radius: 8px; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; border: 1px solid #eee; font-size: 12px; position: relative; text-transform: uppercase; }
-        
-        .peao { width: 22px; height: 22px; border-radius: 50%; position: absolute; z-index: 10; border: 2px solid white; transition: all 0.4s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .casa { width: 80px; height: 80px; border-radius: 8px; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; border: 1px solid #eee; font-size: 10px; position: relative; }
+        .peao { width: 18px; height: 18px; border-radius: 50%; position: absolute; z-index: 10; border: 2px solid white; transition: all 0.4s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         
         /* Cores das Casas */
         .missao { background: #e3f2fd; color: #1976d2; }
         .desafio { background: #fee2e2; color: #dc2626; }
         .sorte { background: #f0fdf4; color: #16a34a; }
-        .pecado { background: #450a0a; color: #fca5a5; border: 3px solid red; }
-        .alvo { background: #fef3c7; color: #d97706; border: 3px solid #fbbf24; border-radius: 50%; }
+        .pecado { background: #450a0a; color: #fca5a5; border: 2px solid red; } /* Armadilha */
+        .alvo { background: #fef3c7; color: #d97706; border: 2px solid #fbbf24; border-radius: 50%; }
 
-        .controles { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
-        .vol-control { display: flex; align-items: center; gap: 8px; background: #eee; padding: 10px; border-radius: 10px; }
+        .controles { margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .vol-control { display: flex; align-items: center; gap: 5px; background: #ddd; padding: 5px 10px; border-radius: 8px; }
         
-        .btn { padding: 15px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; font-size: 16px; }
+        .btn { padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; font-size: 13px; }
         .btn-jogar { background: #10b981; }
         .btn-reset { background: #ef4444; }
 
         #setup { position: fixed; inset: 0; background: white; z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .player-entry { margin: 10px; display: flex; gap: 10px; width: 100%; max-width: 400px; }
-        .player-entry input, .player-entry select { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+        .player-entry { margin: 5px; display: flex; gap: 5px; width: 100%; max-width: 350px; }
         
         .quiz-area { display: none; margin-top: 15px; border-top: 2px solid #eee; padding-top: 10px; }
-        .btn-opcao { display: block; width: 100%; padding: 18px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; text-align: left; font-size: 16px; font-weight: 500; }
-        .dica-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 10px; margin-top: 10px; font-size: 14px; color: #92400e; }
+        .btn-opcao { display: block; width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; text-align: left; font-size: 14px; }
+        .dica { font-size: 12px; color: #666; font-style: italic; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -61,8 +52,8 @@
     </audio>
 
     <div id="setup">
-        <h1 style="color: var(--accent); font-size: 32px; margin-bottom: 10px;">Jornada da Fé 3.0</h1>
-        <p style="font-size: 18px;">Preparem-se para o desafio espiritual!</p>
+        <h1 style="color: var(--accent); margin:0;">Jornada da Fé 2.0</h1>
+        <p>Escolha o nível de cada jogador para começar!</p>
         <div id="lista-jogadores">
             <div class="player-entry">
                 <input type="text" placeholder="Nome" value="Jogador 1">
@@ -73,33 +64,33 @@
                 </select>
             </div>
         </div>
-        <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px; width: 100%; max-width: 350px;">
-            <button class="btn" style="background:#3b82f6" onclick="addJogador()">+ Adicionar Pessoa</button>
-            <button class="btn btn-jogar" onclick="iniciarJogo()">Começar Jogo! 🚀</button>
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px; width: 100%; max-width: 300px;">
+            <button class="btn" style="background:#3b82f6" onclick="addJogador()">+ Adicionar Jogador</button>
+            <button class="btn btn-jogar" onclick="iniciarJogo()">Começar Aventura! 🚀</button>
         </div>
     </div>
 
     <div class="container">
         <div id="tabuleiro-container">
             <div class="controles">
-                <button class="btn btn-jogar" id="btnDado" onclick="jogarDado()">Lançar Dado 🎲</button>
+                <button class="btn btn-jogar" id="btnDado" onclick="jogarDado()">Dado 🎲</button>
                 <div class="vol-control">
                     <span>🔈</span>
                     <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.5" oninput="ajustarVolume()">
                     <span>🔊</span>
                 </div>
-                <button class="btn btn-reset" onclick="location.reload()">Sair</button>
-                <div id="status-turno" style="padding:12px; border-radius:10px; color:white; font-weight:bold; min-width: 100px; text-align:center; font-size: 18px;"></div>
-                <div id="val-dado" style="font-size:32px; font-weight:800; color: var(--accent);"></div>
+                <button class="btn btn-reset" onclick="location.reload()">Reset</button>
+                <div id="status-turno" style="padding:10px; border-radius:8px; color:white; font-weight:bold; min-width: 80px; text-align:center;"></div>
+                <div id="val-dado" style="font-size:24px; font-weight:800;"></div>
             </div>
             <div id="tabuleiro"></div>
         </div>
 
         <aside id="painel-info">
-            <h3 id="info-titulo" style="margin:0 0 15px 0; font-size: 22px;">📍 Missão / Pergunta</h3>
-            <div id="conteudo-painel" style="line-height: 1.5;">Lance o dado para começar!</div>
+            <h3 id="info-titulo" style="margin:0 0 10px 0;">📍 Mensagem</h3>
+            <div id="conteudo-painel">Aguardando início...</div>
             <div id="quiz-container" class="quiz-area">
-                <p id="pergunta" style="font-weight:bold; font-size: 18px;"></p>
+                <p id="pergunta" style="font-weight:bold;"></p>
                 <div id="opcoes"></div>
             </div>
         </aside>
@@ -108,52 +99,48 @@
     <script>
         const cores = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#f97316'];
         
-        // --- BANCO DE MISSÕES SEPARADO POR NÍVEL ---
-        const missoesPorNivel = {
-            basico: [
-                "Sorria para todos! 😊", "Dê um abraço na pessoa ao lado 🤗", "Diga: Jesus me ama! ❤️",
-                "Ore pela sua família 👨‍👩‍👧‍👦", "Diga um motivo de gratidão 🌟", "Cante um refrão de um louvor 🎶",
-                "Diga: Obrigado Senhor! 🙌", "Ore pelo seu amiguinho 🙏", "Mande um beijo para Jesus! 😘"
-            ],
-            intermediario: [
-                "Ore pelos seus vizinhos 🏠", "Cite um Salmo que você conhece 📜", "Ore pela sua cidade 🏙️",
-                "Peça perdão a alguém ou abençoe alguém 🙏", "Ore pelos professores 🎓", "Diga: Sou dizimista por gratidão ⛪",
-                "Explique o que é a fé para você ✨", "Abençoe o seu pai e sua mãe 👨‍👩‍👧‍👦", "Ore pela sua nação 🇧🇷"
-            ],
-            avancado: [
-                "Faça uma mini-pregação de 1 minuto 📢", "Ore pelos seus Pastores e Líderes ⛪", "Abençoe seus avós (ou ore por eles) ❤️",
-                "Diga: Eu amo o Espírito Santo! 🔥", "Cite um versículo de cor 📖", "Faça uma oração de guerra espiritual pela família 🙏",
-                "Fale sobre o fruto do Espírito 🍇", "Ore por quem ainda não conhece Jesus 🌍", "Diga como ser fiel à Palavra de Deus 🛡️"
-            ]
-        };
+        // --- SISTEMA DE MISSÕES ATUALIZADO (17 + Novas sugestões) ---
+        const bancoMissoesOriginal = [
+            "Ore pelo pai 🙏", "Leia um versículo 📖", "Ore Pela Mamãe 🙏", "Cante uma Canção ao Senhor 🎶", 
+            "Ore Pelo Filho 🙏", "Dê uma Palavra de Benção ✨", "Abrace a pessoa ao lado 🤗", "Diga um salmo 📜", 
+            "Diga: Jesus me ama! ❤️", "Sorria! 😊", "Ore por todos 🙏", "Ore pela sua família 👨‍👩‍👧‍👦", 
+            "Ore pelos seus amigos 🤝", "Ore por sua cidade 🏙️", "Ore pela sua nação 🇧🇷", 
+            "Diga: Sou dizimista por gratidão ⛪", "Diga: Obrigado Senhor por minha Família 🙌",
+            "Faça uma pregação de 1 minuto 📢", "Abençoe sua avó(ô) ❤️", "Ore pelos seus vizinhos 🏠",
+            "Ore pelos seus professores 🎓", "Ore pelos seus pastores ⛪", "Peça perdão a alguém presente 🙏",
+            "Diga: Eu amo o Espírito Santo! 🔥", "Cite um motivo de gratidão hoje 🌟"
+        ];
+        let missoesDisponiveis = [...bancoMissoesOriginal];
 
-        // Clonar para controle de repetição
-        let statusMissoes = { basico: [...missoesPorNivel.basico], intermediario: [...missoesPorNivel.intermediario], avancado: [...missoesPorNivel.avancado] };
-
+        // --- BANCO DE PERGUNTAS POR NÍVEIS ---
         const bancoPerguntas = {
             basico: [
-                { p: "Quem construiu a arca?", r: ["Noé", "Moisés", "Pedro"], c: 0, d: "Dica: Está no início da Bíblia.", v: "Gênesis 6:14" },
-                { p: "Quantos dias Deus levou para criar o mundo?", r: ["3", "7", "6"], c: 2, d: "Dica: No sétimo Ele descansou.", v: "Gênesis 1" }
+                { p: "Quem construiu a arca?", r: ["Noé", "Moisés", "Pedro"], c: 0, d: "Dica: Está no livro de Gênesis.", v: "Gênesis 6:14" },
+                { p: "Quem venceu o gigante Golias?", r: ["Saul", "Davi", "Sansão"], c: 1, d: "Dica: Ele era um jovem pastor de ovelhas.", v: "1 Samuel 17" },
+                { p: "Quantos pães Jesus usou para alimentar 5 mil?", r: ["2", "5", "10"], c: 1, d: "Dica: Foi junto com 2 peixinhos.", v: "Mateus 14:17" }
             ],
             intermediario: [
-                { p: "Qual o mar que se abriu para o povo de Israel?", r: ["Mar Morto", "Mar Vermelho", "Mar da Galileia"], c: 1, d: "Dica: Aconteceu no Êxodo.", v: "Êxodo 14:21" },
-                { p: "Qual o primeiro livro do Novo Testamento?", r: ["Lucas", "Mateus", "João"], c: 1, d: "Dica: Vem logo após o Antigo Testamento.", v: "Mateus 1:1" }
+                { p: "Qual o nome do mar que Moisés atravessou?", r: ["Mar Morto", "Mar Vermelho", "Mar da Galileia"], c: 1, d: "Dica: Suas águas se abriram para o povo passar.", v: "Êxodo 14:21" },
+                { p: "Quem foi o sucessor do profeta Elias?", r: ["Eliseu", "Isaías", "Jeremias"], c: 0, d: "Dica: Ele pediu porção dobrada do espírito de seu mestre.", v: "2 Reis 2:9" },
+                { p: "Onde Jesus nasceu?", r: ["Nazaré", "Belém", "Jerusalém"], c: 1, d: "Dica: Conforme a profecia de Miquéias.", v: "Miquéias 5:2" }
             ],
             avancado: [
-                { p: "Quem foi o pai de Matusalém?", r: ["Enoque", "Lameque", "Sete"], c: 0, d: "Dica: Ele não viu a morte, Deus o levou.", v: "Gênesis 5:21" },
-                { p: "Qual profeta foi alimentado por corvos?", r: ["Eliseu", "Elias", "Isaías"], c: 1, d: "Dica: Ele desafiou os profetas de Baal.", v: "1 Reis 17:4" }
+                { p: "Qual o livro mais curto do Antigo Testamento?", r: ["Ageu", "Obadias", "Naum"], c: 1, d: "Dica: Contém apenas 21 versículos.", v: "Obadias 1" },
+                { p: "Quem foi o pai de Matusalém?", r: ["Enoque", "Lameque", "Sete"], c: 0, d: "Dica: O homem que andou com Deus e não viu a morte.", v: "Gênesis 5:21" },
+                { p: "Qual era a profissão de Amós antes de ser profeta?", r: ["Pescador", "Pastor e Cultivador de sicômoros", "Escriba"], c: 1, d: "Dica: Ele trabalhava no campo em Tecoa.", v: "Amós 7:14" }
             ]
         };
 
-        let statusPerguntas = { basico: [...bancoPerguntas.basico], intermediario: [...bancoPerguntas.intermediario], avancado: [...bancoPerguntas.avancado] };
+        let perguntasStatus = { basico: [...bancoPerguntas.basico], intermediario: [...bancoPerguntas.intermediario], avancado: [...bancoPerguntas.avancado] };
         
         let jogadores = [], turno = 0, audioCtx;
         const casasArr = [];
         
+        // Gerando 40 casas com Armadilhas (Pecado)
         for(let i=0; i<40; i++) {
             if(i === 0) casasArr.push({ c: 'branco', t: "INÍCIO" });
             else if(i === 39) casasArr.push({ c: 'alvo', t: "VITÓRIA ⭐" });
-            else if(i === 15 || i === 30) casasArr.push({ c: 'pecado', t: "PECADO: VOLTE AO INÍCIO" });
+            else if(i === 13 || i === 27) casasArr.push({ c: 'pecado', t: "PECADO: VOLTE AO INÍCIO" }); // Armadilhas
             else if(i % 5 === 0) casasArr.push({ c: 'desafio', t: "PERGUNTA" });
             else if(i % 8 === 0) casasArr.push({ c: 'sorte', t: "BÔNUS +1" });
             else casasArr.push({ c: 'missao', t: "MISSÃO" });
@@ -165,7 +152,7 @@
             if(id < 6) {
                 const div = document.createElement('div');
                 div.className = 'player-entry';
-                div.innerHTML = `<input type="text" placeholder="Nome" value="Jogador ${id+1}"><select id="nivel-${id}"><option value="basico">Básico</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado 🔥</option></select>`;
+                div.innerHTML = `<input type="text" placeholder="Nome" value="Jogador ${id+1}"><select id="nivel-${id}"><option value="basico">Nível Básico</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado 🔥</option></select>`;
                 lista.appendChild(div);
             }
         }
@@ -187,7 +174,8 @@
             gerarTabuleiro();
             atualizarInterface();
             setTimeout(posicionar, 100);
-            document.getElementById('musicaFundo').play().catch(() => {});
+            const m = document.getElementById('musicaFundo');
+            m.play().catch(() => {});
         }
 
         function gerarTabuleiro() {
@@ -228,28 +216,17 @@
             const painel = document.getElementById('conteudo-painel');
 
             if(casa.c === 'pecado') {
-                painel.innerHTML = `<b style="color:red; font-size: 22px;">ARMADILHA!</b><br>O pecado atrasa a nossa caminhada. Volte para o início para se renovar.<br><br><button class="btn btn-reset" onclick="voltarInicio()">Recomeçar 🙏</button>`;
+                painel.innerHTML = `<b style="color:red">ARMADILHA!</b><br>O pecado nos afasta do caminho. Volte ao início para se arrepender.<br><br><button class="btn btn-reset" onclick="voltarInicio()">Recomeçar 🙏</button>`;
             } else if(casa.c === 'desafio') {
                 abrirQuiz(jog);
             } else if (casa.c === 'missao') {
-                // Sorteia missões APENAS do nível do jogador
-                const n = jog.nivel;
-                if(statusMissoes[n].length === 0) statusMissoes[n] = [...missoesPorNivel[n]];
-                const idx = Math.floor(Math.random() * statusMissoes[n].length);
-                const missao = statusMissoes[n].splice(idx, 1)[0];
-                
-                painel.innerHTML = `<strong>${jog.nome} (${n})</strong>, cumpra o desafio:<br><br><span style="font-size:22px; color:var(--accent); font-weight:bold">${missao}</span><br><br><button class="btn btn-jogar" onclick="proximoTurno()">Concluído! ✅</button>`;
-            } else if (casa.c === 'sorte') {
-                painel.innerHTML = `✨ <b>BÔNUS!</b> Você foi abençoado e avança mais 1 casa.<br><br><button class="btn btn-jogar" onclick="moverBonus()">Avançar 🚀</button>`;
+                if(missoesDisponiveis.length === 0) missoesDisponiveis = [...bancoMissoesOriginal];
+                const idx = Math.floor(Math.random() * missoesDisponiveis.length);
+                const missao = missoesDisponiveis.splice(idx, 1)[0];
+                painel.innerHTML = `<strong>${jog.nome}</strong>, sua missão é:<br><br><span style="font-size:18px; color:var(--accent); font-weight:bold">${missao}</span><br><br><button class="btn btn-jogar" onclick="proximoTurno()">Concluído! ✅</button>`;
             } else {
                 proximoTurno();
             }
-        }
-
-        function moverBonus() {
-            jogadores[turno].pos = Math.min(39, jogadores[turno].pos + 1);
-            posicionar();
-            proximoTurno();
         }
 
         function voltarInicio() {
@@ -260,13 +237,13 @@
 
         function abrirQuiz(jog) {
             let n = jog.nivel;
-            if(statusPerguntas[n].length === 0) statusPerguntas[n] = [...bancoPerguntas[n]];
-            const idx = Math.floor(Math.random() * statusPerguntas[n].length);
-            const q = statusPerguntas[n].splice(idx, 1)[0];
+            if(perguntasStatus[n].length === 0) perguntasStatus[n] = [...bancoPerguntas[n]];
+            const idx = Math.floor(Math.random() * perguntasStatus[n].length);
+            const q = perguntasStatus[n].splice(idx, 1)[0];
 
             const area = document.getElementById('quiz-container');
             area.style.display = 'block';
-            document.getElementById('pergunta').innerHTML = `${q.p}<div class="dica-box">💡 ${q.d}</div>`;
+            document.getElementById('pergunta').innerHTML = `${q.p}<br><small class="dica">${q.d}</small>`;
             const ops = document.getElementById('opcoes');
             ops.innerHTML = '';
             
@@ -276,10 +253,10 @@
                 b.innerText = txt;
                 b.onclick = () => {
                     if(i === q.c) {
-                        alert(`EXCELENTE! 🎉\nResposta em: ${q.v}\nAvance 1 casa.`);
+                        alert(`CORRETO! 🎉\nVersículo: ${q.v}\nAvance 1 casa.`);
                         jog.pos = Math.min(39, jog.pos + 1);
                     } else {
-                        alert(`QUASE! ❌\nA resposta correta estava em ${q.v}.\nVolte 1 casa.`);
+                        alert(`ERROU! ❌\nA resposta correta estava em ${q.v}.\nVolte 1 casa.`);
                         jog.pos = Math.max(0, jog.pos - 1);
                     }
                     posicionar(); area.style.display = 'none'; proximoTurno();
@@ -291,11 +268,11 @@
         function proximoTurno() {
             if(jogadores[turno].pos === 39) {
                 confetti({particleCount: 200, spread: 90, origin: { y: 0.6 }});
-                alert("🏆 GLÓRIA A DEUS! " + jogadores[turno].nome.toUpperCase() + " VENCEU!");
+                alert("🏆 " + jogadores[turno].nome.toUpperCase() + " COMPLETOU A JORNADA!");
                 location.reload();
                 return;
             }
-            document.getElementById('conteudo-painel').innerText = "Vez do próximo jogador...";
+            document.getElementById('conteudo-painel').innerText = "Próximo jogador...";
             turno = (turno + 1) % jogadores.length;
             atualizarInterface();
             document.getElementById('btnDado').disabled = false;
@@ -308,7 +285,7 @@
                 const r = c.getBoundingClientRect();
                 const tr = document.getElementById('tabuleiro').getBoundingClientRect();
                 const p = document.getElementById(`peao-${j.id}`);
-                const size = window.innerWidth <= 850 ? 15 : 30;
+                const size = window.innerWidth <= 850 ? 12 : 25;
                 p.style.left = (r.left - tr.left + size + (j.id*2)) + 'px';
                 p.style.top = (r.top - tr.top + size + (j.id*2)) + 'px';
             });
